@@ -7,7 +7,7 @@ Projeto para a atividade da faculdade
 >- Criar: Modelo conceitual
 >- Criar: python CREATE
 >
-> **Isabela**
+> **Isabeli**
 > - Criar: Modelo logico
 > - Criar: python DELETE
 >
