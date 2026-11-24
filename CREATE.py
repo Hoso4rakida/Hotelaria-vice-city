@@ -3,7 +3,7 @@ CREATE.py
 import psycopg2
 conexao = psycopg2.connect(
     host="localhost",
-    database="postgres",
+    database="hotelaria",
     user= "postgres",
     password= "peruere",
     port= "5432"
@@ -30,3 +30,4 @@ cursor.execute("""
     numero_quarto INT NOT NULL REFERENCES Quartos(numero)
     );""")
 
+conexao.commit()
