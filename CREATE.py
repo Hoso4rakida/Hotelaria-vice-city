@@ -5,7 +5,7 @@ conexao = psycopg2.connect(
     host="localhost",
     database="hotelaria",
     user= "postgres",
-    password= "peruere",
+    password= "Arakida",
     port= "5432"
 )
 ursor = conexao.cursor()
