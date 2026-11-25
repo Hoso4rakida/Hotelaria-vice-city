@@ -8,7 +8,7 @@ conexao = psycopg2.connect(
     password= "Arakida",
     port= "5432"
 )
-ursor = conexao.cursor()
+cursor = conexao.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS Hospedes(
     Nome VARCHAR(100) NOT NULL,
