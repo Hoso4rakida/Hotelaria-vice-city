@@ -1,5 +1,3 @@
-CREATE.py
-
 import psycopg2
 conexao = psycopg2.connect(
     host="localhost",
