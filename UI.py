@@ -1,5 +1,7 @@
 import os
+import re
 from contextlib import closing
+from decimal import Decimal, InvalidOperation
 
 import psycopg2
 
@@ -36,6 +38,39 @@ def ler_inteiro(mensagem):
         print(f"{VERMELHO}Digite apenas numeros.{RESET}")
 
 
+def normalizar_cpf(cpf):
+    """Remove a mascara do CPF para comparar com o valor gravado no banco."""
+    return re.sub(r"\D", "", cpf)
+
+
+def ler_texto_opcional(mensagem):
+    """Enter mantém o valor atual do campo."""
+    return input(mensagem).strip() or None
+
+
+def ler_inteiro_opcional(mensagem):
+    """Enter mantém o valor atual; caso contrário, lê um inteiro positivo."""
+    while True:
+        valor = input(mensagem).strip()
+        if not valor:
+            return None
+        if valor.isdigit():
+            return int(valor)
+        print(f"{VERMELHO}Digite apenas numeros.{RESET}")
+
+
+def ler_preco_opcional(mensagem):
+    """Enter mantém o valor atual; caso contrário, lê um preço decimal."""
+    while True:
+        valor = input(mensagem).strip().replace(",", ".")
+        if not valor:
+            return None
+        try:
+            return Decimal(valor)
+        except InvalidOperation:
+            print(f"{VERMELHO}Digite um preco valido.{RESET}")
+
+
 def cadastrar_cliente(cursor, conexao):
     cpf = input(f"{AZUL}CPF (000.000.000-00): {RESET}").strip()
     nome = input(f"{AZUL}Nome: {RESET}").strip()
@@ -50,6 +85,36 @@ def cadastrar_cliente(cursor, conexao):
         print(f"\n{VERMELHO}Erro: {erro}{RESET}")
 
 
+def atualizar_cliente(conexao):
+    cpf = normalizar_cpf(
+        input(f"{AZUL}CPF do cliente (000.000.000-00): {RESET}").strip()
+    )
+    nome = ler_texto_opcional(f"{AZUL}Novo nome (Enter para manter): {RESET}")
+    email = ler_texto_opcional(f"{AZUL}Novo e-mail (Enter para manter): {RESET}")
+    telefone = ler_texto_opcional(f"{AZUL}Novo telefone (Enter para manter): {RESET}")
+
+    if UPDATE.atualizar_hospede(conexao, cpf, nome, email, telefone):
+        print(f"\n{VERDE}Cliente atualizado!{RESET}")
+    else:
+        print(f"\n{AMARELO}Cliente nao encontrado.{RESET}")
+
+
+def atualizar_quarto(conexao):
+    numero = ler_inteiro(f"{AZUL}Numero do quarto: {RESET}")
+    tipo = ler_texto_opcional(f"{AZUL}Novo tipo (Enter para manter): {RESET}")
+    capacidade = ler_inteiro_opcional(
+        f"{AZUL}Nova capacidade (Enter para manter): {RESET}"
+    )
+    preco_diaria = ler_preco_opcional(
+        f"{AZUL}Novo preco da diaria (Enter para manter): {RESET}"
+    )
+
+    if UPDATE.atualizar_quarto(conexao, numero, tipo, capacidade, preco_diaria):
+        print(f"\n{VERDE}Quarto atualizado!{RESET}")
+    else:
+        print(f"\n{AMARELO}Quarto nao encontrado.{RESET}")
+
+
 def main():
     try:
         with closing(READ.conectar()) as conexao:
@@ -61,6 +126,7 @@ def main():
                     print(f"  {NEGRITO}[3]{RESET} Excluir cliente (e suas reservas)")
                     print(f"  {NEGRITO}[4]{RESET} Atualizar cliente")
                     print(f"  {NEGRITO}[5]{RESET} Consultar dados")
+                    print(f"  {NEGRITO}[6]{RESET} Atualizar quarto")
                     print(f"  {NEGRITO}[0]{RESET} Sair")
                     opcao = input(f"\n{AZUL}Escolha: {RESET}").strip()
 
@@ -74,13 +140,11 @@ def main():
                             cpf = input(f"{AZUL}CPF do cliente (000.000.000-00): {RESET}").strip()
                             DELETE.excluir_cliente(cursor, conexao, cpf)
                         elif opcao == "4":
-                            cpf = input(f"{AZUL}CPF do cliente (000.000.000-00): {RESET}").strip()
-                            nome = input(f"{AZUL}Novo nome: {RESET}").strip()
-                            email = input(f"{AZUL}Novo e-mail: {RESET}").strip()
-                            telefone = input(f"{AZUL}Novo telefone: {RESET}").strip()
-                            UPDATE.atualizar(cursor, conexao, cpf, nome, email, telefone)
+                            atualizar_cliente(conexao)
                         elif opcao == "5":
                             READ.consultar(cursor)
+                        elif opcao == "6":
+                            atualizar_quarto(conexao)
                         elif opcao == "0":
                             print(f"\n{VERDE}Ate logo!{RESET}\n")
                             break

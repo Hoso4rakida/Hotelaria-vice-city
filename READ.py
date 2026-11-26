@@ -61,22 +61,27 @@ def imprimir_registros(titulo, colunas, registros):
         print("  " + " | ".join(str(valor) for valor in registro))
 
 
+def consultar(cursor):
+    """Imprime hóspedes, quartos e reservas usando o cursor informado."""
+    imprimir_registros(
+        "Hospedes", ["CPF", "Nome", "E-mail", "Telefone"],
+        listar_hospedes(cursor),
+    )
+    imprimir_registros(
+        "Quartos", ["Numero", "Tipo", "Capacidade", "Preco da diaria"],
+        listar_quartos(cursor),
+    )
+    imprimir_registros(
+        "Reservas", ["ID", "CPF", "Hospede", "Quarto", "Tipo", "Preco"],
+        listar_reservas(cursor),
+    )
+
+
 def main():
     try:
         with closing(conectar()) as conexao:
             with conexao.cursor() as cursor:
-                imprimir_registros(
-                    "Hospedes", ["CPF", "Nome", "E-mail", "Telefone"],
-                    listar_hospedes(cursor),
-                )
-                imprimir_registros(
-                    "Quartos", ["Numero", "Tipo", "Capacidade", "Preco da diaria"],
-                    listar_quartos(cursor),
-                )
-                imprimir_registros(
-                    "Reservas", ["ID", "CPF", "Hospede", "Quarto", "Tipo", "Preco"],
-                    listar_reservas(cursor),
-                )
+                consultar(cursor)
     except psycopg2.Error as erro:
         print(f"Erro ao consultar o banco: {erro}")
 

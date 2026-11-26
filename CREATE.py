@@ -4,3 +4,10 @@ def cadastrar_cliente(cursor, cpf, nome, email, telefone):
         (cpf, nome, email, telefone),
     )
     return cursor.rowcount
+
+def cadastrar_quarto(cursor, numero,):
+    cursor.execute(
+        "INSERT INTO Hospedes (cpf, nome, email, telefone) VALUES (%s, %s, %s, %s);",
+        (cpf, nome, email, telefone),
+    )
+    return cursor.rowcount
